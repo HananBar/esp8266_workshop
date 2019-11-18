@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link media="screen" type="text/css" href="../style.css" rel="stylesheet">
+    </head>
+  <body>
+    <div id="headline">
+      <h1>ESP8266 Workshop</h1>
+      <h2>Task 10: Display</h2>
+    </div>
+    <div id="name_and_number">
+      <h2>Group <text class="group_number"></text> - <text class="group_name"></text><h2>
+      <a class="enabled_page" href="./task_01.html">1</a>
+      <a class="enabled_page" href="./task_02.html">2</a>
+      <a class="enabled_page" href="./task_03.html">3</a>
+      <a class="enabled_page" href="./task_04.html">4</a>
+      <a class="enabled_page" href="./task_05.html">5</a>
+      <a class="enabled_page" href="./task_06.html">6</a>
+      <a class="enabled_page" href="./task_07.html">7</a>
+      <a class="enabled_page" href="./task_08.html">8</a>
+      <a class="enabled_page" href="./task_09.html">9</a>
+      <a class="active" href="#">10</a>
+    </div>
+    <div id="steps">
+      <div class="step" id="step01">
+        <h3>Background</h3>
+        <p>
+          This is the last task.<br>
+          It has 2 parts<br>
+          <ol>
+            <li>Connecting an I2C device</li>
+            <li>Designing your own display</li>
+          </ol>
+        </p>
+        <br>
+        <button onclick="show_step('step02')">Next</button>
+      </div>
+      <div class="step" id="step02">
+        <h3>I2C</h3>
+        <p>
+          I2C is a synchronous, multi-master, multi-slave, packet switched, single-ended, serial computer bus<br>
+          invented in 1982 by Philips Semiconductor (now NXP Semiconductors).<br>
+          It is widely used for attaching lower-speed peripheral ICs to processors and microcontrollers in short-distance<br>
+          It uses only 2 lines - Serial Data Line (SDA) and Serial Clock Line (SCL)<br>
+          <br>
+          In our device the 2 lines are D1-SDA and D2-SCL<br>
+          <img src="../images/nodemcu_pinout.png"/><br>
+        </p>
+        <button onclick="show_step('step01')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step03')">Next</button>
+      </div>
+      <div class="step" id="step03">
+        <h3>Library example</h3>
+        <p>
+          The I2C device we have is an OLED screen, and we'll use it to create a display for the system we've created.<br>
+          In order this screen with ESP8266, you should download <b>"ESP8266 and ESP32 Oled Driver for SSD1306 display"</b><br>
+          <br>
+          If you'd like to see what kind of things you can do with it - try loading an example sketch from:<br>
+          File->Examples->ESP8266 and ESP32 Oled Driver for SSD1306 display->SSD1306SimpleDemo<br>
+          <img src="../images/example_menu.png"/><br>
+        </p>
+        <button onclick="show_step('step02')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step04')">Next</button>
+      </div>
+      <div class="step" id="step04">
+        <h3>System display</h3>
+        <p>
+          Your task is to create a display for the device you created.<br>
+          You can use whatever you want to construct it.<br>
+          <br>
+          The following code shows an example function for an incomplete display:
+          <code>
+            void drawDisplay(void){<br>&nbsp;&nbsp;
+              display.clear();<br>&nbsp;&nbsp;
+              display.drawHorizontalLine(0, 0, 128);<br>&nbsp;&nbsp;
+              display.drawHorizontalLine(0, 25, 128);<br>&nbsp;&nbsp;
+              display.drawVerticalLine(0, 0, 25);<br>&nbsp;&nbsp;
+              display.drawVerticalLine(68, 0, 25);<br>&nbsp;&nbsp;
+              display.drawVerticalLine(127, 0, 25);<br>&nbsp;&nbsp;
+              display.setTextAlignment(TEXT_ALIGN_LEFT);<br>&nbsp;&nbsp;
+              display.drawString(20, 7, "16:20");<br>&nbsp;&nbsp;
+              display.setTextAlignment(TEXT_ALIGN_RIGHT);<br>&nbsp;&nbsp;
+              display.drawString(104, 7, String(30));<br>&nbsp;&nbsp;
+              display.drawCircle(108, 10, 2);<br>&nbsp;&nbsp;
+              display.drawString(55, 30, "TV");<br>&nbsp;&nbsp;
+              // assume TV is on (fill circle)<br>&nbsp;&nbsp;
+              display.fillCircle(60, 48, 4);<br>&nbsp;&nbsp;
+              display.display();<br>
+            }
+          </code>
+        </p>
+        <button onclick="show_step('step03')">Back</button><br>
+        <b>If you're done - call an instructor to check and to get your points before continuing</b>
+        <br>
+        <br>
+        <br>
+        <br>
+        Click to continue to bonus tasks<br>
+        <button onclick="location.href='./bonus_1.html';">Done</button>
+      </div>
+      <text id="debug_text"></text>
+    </div>
+    <br><br><br><br><br><br>
+    <script src="../instructions.js" type="text/javascript"></script>
+  </body>
+</html>

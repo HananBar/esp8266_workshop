@@ -1,0 +1,55 @@
+base_ip: 0
+dynamic_ip: 100
+groups:
+- degrees: 100
+  mac: dc-4f-22-19-a5-ff
+  number: 1
+- degrees: 100
+  mac: b4-e6-2d-37-22-b8
+  number: 2
+- degrees: 100
+  mac: dc-4f-22-18-de-d6
+  number: 3
+- degrees: 100
+  mac: b4-e6-2d-37-34-8e
+  number: 4
+- degrees: 100
+  mac: dc-4f-22-18-d7-ae
+  number: 5
+- degrees: 100
+  mac: b4-e6-2d-37-39-ca
+  number: 6
+- degrees: 100
+  mac: 68-c6-3a-d5-36-71
+  number: 7
+- degrees: 100
+  mac: b4-e6-2d-37-16-77
+  number: 8
+- degrees: 100
+  mac: b4-e6-2d-37-3e-03
+  number: 9
+- degrees: 100
+  mac: b4-e6-2d-37-42-29
+  number: 10
+- degrees: 100
+  mac: b4-e6-2d-37-38-36
+  number: 11
+- degrees: 100
+  mac: dc-4f-22-19-a0-54
+  number: 12
+- degrees: 100
+  mac: dc-4f-22-19-a7-63
+  number: 13
+- degrees: 100
+  mac: b4-e6-2d-37-12-a7
+  number: 14
+- degrees: 100
+  mac: b4-e6-2d-37-3f-e9
+  number: 15
+- degrees: 100
+  mac: dc-4f-22-18-d0-b3
+  number: 16
+groups_number: 16
+serial1: COM3
+serial2: COM4
+subnet_ip: 192.168.1.

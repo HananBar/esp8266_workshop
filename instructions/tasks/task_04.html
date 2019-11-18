@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link media="screen" type="text/css" href="../style.css" rel="stylesheet">
+    </head>
+  <body>
+    <div id="headline">
+      <h1>ESP8266 Workshop</h1>
+      <h2>Task 4: Status Report</h2>
+    </div>
+    <div id="name_and_number">
+      <h2>Group <text class="group_number"></text> - <text class="group_name"></text><h2>
+      <a class="enabled_page" href="./task_01.html">1</a>
+      <a class="enabled_page" href="./task_02.html">2</a>
+      <a class="enabled_page" href="./task_03.html">3</a>
+      <a class="active" href="#">4</a>
+      <a class="enabled_page" href="./task_05.html">5</a>
+      <a class="enabled_page" href="./task_06.html">6</a>
+      <a class="enabled_page" href="./task_07.html">7</a>
+      <a class="enabled_page" href="./task_08.html">8</a>
+      <a class="enabled_page" href="./task_09.html">9</a>
+      <a class="enabled_page" href="./task_10.html">10</a>
+    </div>
+    <div id="steps">
+      <div class="step" id="step01">
+        <h3>Background</h3>
+        <p>
+          The idea in this task is to get the current status from the device.
+          The data we need to add to the report:
+          <table>
+            <tr><td>Group Name</td><td><text class="group_name"></text></td></tr>
+            <tr><td>Group Number</td><td><text class="group_number"></text></td></tr>
+            <tr><td>Room Temperature</td><td>0 for now</td></tr>
+            <tr><td>Time</td><td>0:00 for now</td></tr>
+          </table>
+        </p>
+        <br>
+        <button onclick="show_step('step02')">Next</button>
+      </div>
+      <div class="step" id="step02">
+        <h3>JSON</h3>
+        <p>
+          The status report will be in JSON format. you can read more about it <a href="https://www.w3schools.com/js/js_json_intro.asp" target="_blank">here</a>.<br>
+          for Example, the group "<text class="group_name"></text>", which are group <text class="group_number"></text> will have the report like this:
+          <code>
+            {"name":"<text class="group_name"></text>", "number":<text class="group_number"></text>, "temperature":0, "time":"0:00"}
+          </code>
+          note that name and time are strings (surrounded by ""), while number and temperature are numbers.<br>
+          <br>
+          <br>
+          A function that creates such a response can be implemented like this:
+          <code>
+            void sendJsonResponse(){<br>&nbsp;&nbsp;
+              server.sendHeader("Access-Control-Allow-Origin", "*"); //this line is not manatory but makes it possible to query using scripts<br>&nbsp;&nbsp;
+              String message = "{\"name\":\"<text class="group_name"></text>\",";<br>&nbsp;&nbsp;
+              message += "\"number\":<text class="group_number"></text>,";<br>&nbsp;&nbsp;
+              message += "\"temperature\":0,";<br>&nbsp;&nbsp;
+              message += "\"time\":\"0:00\"}";<br>&nbsp;&nbsp;
+              server.send(200, <b>"application/json"</b>, message);<br>
+            }
+          </code>
+          Then, all that's needed is to add the callback in the setup function.
+          <code>
+            server.on("/json", sendJsonResponse);
+          </code>
+        </p>
+        <button onclick="show_step('step01')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step03')">See the entire code</button>
+      </div>
+      <div class="step" id="step03">
+        <h3>JSON response code</h3>
+        <code>
+          #include &lt;ESP8266WiFi.h&gt;<br>
+          #include &lt;ESP8266WebServer.h&gt;<br>
+          <br>
+          const char* ssid     = "intel makers";<br>
+          const char* password = "1234567890";<br>
+          #define ONBOARD_LED_PIN D4<br>
+          <br>
+          ESP8266WebServer server(80);<br>
+          <br>
+          void handleRoot(){<br>&nbsp;&nbsp;
+            server.send(200, "text/plain", "Hooray!, your ESP8266 server is alive!");<br>
+          }<br>
+          <br>
+          void handleNotFound(){<br>&nbsp;&nbsp;
+            server.send(404, "text/plain", "Error 404 - ESP8266 server could not find the page you were looking for");<br>
+          }<br>
+          <br><b>
+          void sendJsonResponse(){<br>&nbsp;&nbsp;
+            server.sendHeader("Access-Control-Allow-Origin", "*");<br>&nbsp;&nbsp;
+            String message = "{\"name\":\"<text class="group_name"></text>\",";<br>&nbsp;&nbsp;
+            message += "\"number\":<text class="group_number"></text>,";<br>&nbsp;&nbsp;
+            message += "\"temperature\":0,";<br>&nbsp;&nbsp;
+            message += "\"time\":\"0:00\"}";<br>&nbsp;&nbsp;
+            server.send(200, <b>"application/json"</b>, message);<br>
+          }<br></b>
+          <br>
+          void setup() {<br>&nbsp;&nbsp;
+            // setup the on-board pin (D4) to output mode<br>&nbsp;&nbsp;
+            pinMode(ONBOARD_LED_PIN, OUTPUT);<br>&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;
+            // start serial connection<br>&nbsp;&nbsp;
+            Serial.begin(115200);<br>&nbsp;&nbsp;
+            Serial.println("");<br>&nbsp;&nbsp;
+            Serial.print("Connecting to ");<br>&nbsp;&nbsp;
+            Serial.println(ssid);<br>&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;
+            // set WiFi to STA mode<br>&nbsp;&nbsp;
+            WiFi.mode(WIFI_STA);<br>&nbsp;&nbsp;
+            // set static IP<br>&nbsp;&nbsp;
+            IPAddress ip(192,168,1,<text class="group_number"></text>);<br>&nbsp;&nbsp;
+            IPAddress gateway(192,168,1,254);<br>&nbsp;&nbsp;
+            IPAddress subnet(255,255,255,0);<br>&nbsp;&nbsp;
+            WiFi.config(ip, gateway, subnet);<br>&nbsp;&nbsp;
+            // connect to AP<br>&nbsp;&nbsp;
+            WiFi.begin(ssid, password);<br>&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;
+            // wait until connection is complete<br>&nbsp;&nbsp;
+            while (WiFi.status() != WL_CONNECTED) {<br>&nbsp;&nbsp;&nbsp;&nbsp;
+              delay(500);<br>&nbsp;&nbsp;&nbsp;&nbsp;
+              Serial.print(".");<br>&nbsp;&nbsp;
+            }<br>&nbsp;&nbsp;
+            Serial.println("");<br>&nbsp;&nbsp;
+            Serial.println("WiFi connected");<br>&nbsp;&nbsp;
+            Serial.println("IP address: ");<br>&nbsp;&nbsp;
+            Serial.println(WiFi.localIP());<br>
+            <br>&nbsp;&nbsp;
+            server.on("/", handleRoot);<br>&nbsp;&nbsp;<b>
+            server.on("/json", sendJsonResponse);<br>&nbsp;&nbsp;</b>
+            server.onNotFound(handleNotFound);<br>&nbsp;&nbsp;
+            server.begin();<br>
+          }<br>
+          <br>
+          void loop()<br>
+          {<br>&nbsp;&nbsp;
+            // toggle the LED each 0.1 second<br>&nbsp;&nbsp;
+            digitalWrite(ONBOARD_LED_PIN, HIGH);<br>&nbsp;&nbsp;
+            delay(100);<br>&nbsp;&nbsp;
+            digitalWrite(ONBOARD_LED_PIN, LOW);<br>&nbsp;&nbsp;
+            delay(100);<br>&nbsp;&nbsp;
+            server.handleClient();<br>
+          }<br>
+        <br>
+        </code>
+        <br><br>
+        <button onclick="show_step('step02')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step04')">Next</button>
+      </div>
+      <div class="step" id="step04">
+        <h3>JSON reponse - verification</h3>
+        <p>
+          browse to <a class="group_number_link" href="/json" target="_blank">192.168.1.<text class="group_number"></text></a><br>
+          you should see a similar message<br>
+          <img src="../images/browse_json.png"/><br>
+          <br>
+        </p>
+        <br>
+        <br>
+        <br>
+        <p>Click "Test me" when you are ready.</p>
+        <button onclick="show_step('step03')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="test_me(4, 5)">Test me</button>&nbsp;&nbsp;&nbsp;
+        <button id="next_task" onclick="location.href='./task_05.html';" disabled>Next Task</button>
+        <br>
+        <textarea id="server_test_text" rows="15" cols="120"></textarea>
+      </div>
+      <text id="debug_text"></text>
+    </div>
+    <br><br><br><br><br><br>
+    <script src="../instructions.js" type="text/javascript"></script>
+  </body>
+</html>

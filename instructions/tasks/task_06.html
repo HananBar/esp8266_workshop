@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link media="screen" type="text/css" href="../style.css" rel="stylesheet">
+    </head>
+  <body>
+    <div id="headline">
+      <h1>ESP8266 Workshop</h1>
+      <h2>Task 6: Time</h2>
+    </div>
+    <div id="name_and_number">
+      <h2>Group <text class="group_number"></text> - <text class="group_name"></text><h2>
+      <a class="enabled_page" href="./task_01.html">1</a>
+      <a class="enabled_page" href="./task_02.html">2</a>
+      <a class="enabled_page" href="./task_03.html">3</a>
+      <a class="enabled_page" href="./task_04.html">4</a>
+      <a class="enabled_page" href="./task_05.html">5</a>
+      <a class="active" href="#">6</a>
+      <a class="enabled_page" href="./task_07.html">7</a>
+      <a class="enabled_page" href="./task_08.html">8</a>
+      <a class="enabled_page" href="./task_09.html">9</a>
+      <a class="enabled_page" href="./task_10.html">10</a>
+    </div>
+    <div id="steps">
+      <div class="step" id="step01">
+        <h3>Background</h3>
+        <p>
+          In this task - you will get the time back from an NTP server.<br>
+          The Network Time Protocol (NTP) is a networking protocol for clock synchronization<br>
+          between computer systems over packet-switched, variable-latency data networks.<br>
+          NTP is intended to synchronize all participating computers to within a few<br>
+          milliseconds of Coordinated Universal Time (UTC).<br>
+          <br>
+          Since our network is not connected to the Internet - we host our own NTP server at 192.168.1.100
+        </p>
+        <br>
+        <button onclick="show_step('step02')">Next</button>
+      </div>
+      <div class="step" id="step02">
+        <h3>Send and receive NTP packet</h3>
+        <p>
+          In order to get time from NTP server, we need to add 2 includes:
+          <code>
+            #include &lt;WiFiUdp.h&gt;<br>
+            #include &lt;time.h&gt;
+          </code>
+          <br>
+          Then call the "configTime" function with our time zone, daylight savings time offset and the NTP server address
+          <code>
+            // 2 * 3600 - seconds offset from GMT<br>
+            // 0 * 3600 (or 0) seconds offset for daylight savings time<br>
+            // "192.168.1.100" - NTP server address<br>
+            configTime(2 * 3600, 0 * 3600, "192.168.1.100");
+          </code>
+          <br>
+          After calling configTime, we need to check that time was updated.<br>
+          This can be done by calling "time" function with a null pointer,<br>
+          <code>
+          time(nullptr);
+          </code>
+          which returns the seconds since January 1st 1970.<br>
+          In some boards if time was not set, function will return 0, <br>
+          in others 8AM January 1st 1970.<br>
+          Either way, if the function returns a value under 100000,<br>
+          it's a good indication that time was not set properly.<br>
+          <br>
+          An example for a function that sends an NTP packet and waits for time to be updated:
+          <code>
+            void getNtpTime() {<br>&nbsp;&nbsp;
+              Serial.println("Trying to get time");<br>&nbsp;&nbsp;
+              configTime(2 * 3600, 0 * 3600, "192.168.1.100"); //GMT+2, no DST<br>&nbsp;&nbsp;
+              while (time(nullptr) < 100000) {<br>&nbsp;&nbsp;&nbsp;&nbsp;
+                delay(100);<br>&nbsp;&nbsp;&nbsp;&nbsp;
+                Serial.print(".");<br>&nbsp;&nbsp;
+              }<br>&nbsp;&nbsp;
+              Serial.println("\nGot Time");<br>
+            }
+          </code>
+          <br>
+          And in order to have time in a nice format, ready for the JSON response<br>
+          *buff should be at least 10 bytes long.
+          <code>
+            void getTimeString(char* buff){<br>&nbsp;&nbsp;
+              time_t now = time(nullptr);<br>&nbsp;&nbsp;
+              strftime(buff, 10, "%H:%M", localtime(&now));<br>
+            }
+          </code>
+        </p>
+        <button onclick="show_step('step01')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step03')">See the entire code</button>
+      </div>
+      <div class="step" id="step03">
+        <h3>JSON response code</h3>
+        <code>
+          #include &lt;ESP8266WiFi.h&gt;<br>
+          #include &lt;ESP8266WebServer.h&gt;<br><b>
+          #include &lt;WiFiUdp.h&gt;<br>
+          #include &lt;time.h&gt;<br></b>
+          <br>
+          /*******************************<br>
+          &nbsp;* defines and constants &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*<br>
+          &nbsp;*******************************/<br>
+          const char* ssid     =     "intel makers";<br>
+          const char* password =     "1234567890";<br>
+          #define ONBOARD_LED_PIN    D4<br>
+          #define THERMISTOR_1_DIV_B (0.000253165)<br>
+          #define THERMISTOR_T0      (293)<br>
+          #define THERMISTOR_R0      (100000)<br>
+          #define R1_VALUE           (100000)<br>
+          <br>
+          /*******************************<br>
+          &nbsp;* Globals &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*<br>
+          &nbsp;*******************************/<br>
+          ESP8266WebServer server(80);<br>
+          <br>
+          /*******************************<br>
+          &nbsp;* service functions &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*<br>
+          &nbsp;*******************************/<br>
+          float getThermistorResistance(int resistor_value) {<br>&nbsp;&nbsp;
+            // first - read the analog input to get the voltage across the thermistor<br>&nbsp;&nbsp;
+            int a_read = analogRead(A0);<br>&nbsp;&nbsp;
+            // analog input is 0-1023 where 1023==3.3V<br>&nbsp;&nbsp;
+            float thermistor_voltage = (((float)a_read)/1023.0)*3.3;<br>&nbsp;&nbsp;
+            // current across thermistor is the same as across the resistor, <br>&nbsp;&nbsp;
+            // so calculate over the known resistor value<br>&nbsp;&nbsp;
+            float thermistor_current = (3.3 - thermistor_voltage)/resistor_value;<br>&nbsp;&nbsp;
+            // R = V/I<br>&nbsp;&nbsp;
+            return (thermistor_voltage / thermistor_current);<br>
+          }<br>
+          <br>
+          int getTemperature(float thermistor_1divB, int thermistor_t0, int thermistor_r0, int resistor_value) {<br>&nbsp;&nbsp;
+            float thermistor_resistance = getThermistorResistance(resistor_value);<br>&nbsp;&nbsp;
+            // caluclate coefficient (1/b*ln(r/r0) - replace ln with log)<br>&nbsp;&nbsp;
+            float coeff = thermistor_1divB * log(thermistor_resistance/thermistor_r0);<br>&nbsp;&nbsp;
+            // calculate 1/t0+1/b*ln(r/r0)<br>&nbsp;&nbsp;
+            coeff = (1.0/thermistor_t0) + coeff;<br>&nbsp;&nbsp;
+            // invert the result since formula is for 1/t<br>&nbsp;&nbsp;
+            float temp_kelvin = 1.0 / coeff;<br>&nbsp;&nbsp;
+            // translate from Kelvin to Celsius<br>&nbsp;&nbsp;
+            float temp = temp_kelvin - 273;<br>&nbsp;&nbsp;
+            // round the temperature<br>&nbsp;&nbsp;
+            return round(temp);<br>
+          }<br>
+          <br><b>
+          void getNtpTime() {<br>&nbsp;&nbsp;
+            Serial.println("Trying to get time");<br>&nbsp;&nbsp;
+            configTime(2 * 3600, 0 * 3600, "192.168.1.100"); //GMT+2, no DST<br>&nbsp;&nbsp;
+            while (time(nullptr) < 100000) {<br>&nbsp;&nbsp;&nbsp;&nbsp;
+              delay(100);<br>&nbsp;&nbsp;&nbsp;&nbsp;
+              Serial.print(".");<br>&nbsp;&nbsp;
+            }<br>&nbsp;&nbsp;
+            Serial.println("\nGot Time");<br>
+          }<br>
+          <br>
+          void getTimeString(char* buff){<br>&nbsp;&nbsp;
+            time_t now = time(nullptr);<br>&nbsp;&nbsp;
+            strftime(buff, 10, "%H:%M", localtime(&now));<br>
+          }<br>
+          <br></b>
+          /*******************************<br>
+          &nbsp;* server callbacks &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*<br>
+          &nbsp;*******************************/<br>
+          void handleRoot(){<br>&nbsp;&nbsp;
+            server.send(200, "text/plain", "Hooray!, your ESP8266 server is alive!");<br>
+          }<br>
+          <br>
+          void handleNotFound(){<br>&nbsp;&nbsp;
+            server.send(404, "text/plain", "Error 404 - ESP8266 server could not find the page you were looking for");<br>
+          }<br>
+          <br>
+          void sendJsonResponse(){<br>&nbsp;&nbsp;<b>
+            char time_buff[10];<br>&nbsp;&nbsp;</b>
+            server.sendHeader("Access-Control-Allow-Origin", "*");<br>&nbsp;&nbsp;
+            String message = "{\"name\":\"<text class="group_name"></text>\",";<br>&nbsp;&nbsp;
+            message += "\"number\":<text class="group_number"></text>,";<br>&nbsp;&nbsp;
+            message += "\"temperature\":";<br>&nbsp;&nbsp;
+            message += getTemperature(THERMISTOR_1_DIV_B, THERMISTOR_T0, THERMISTOR_R0, R1_VALUE);<br>&nbsp;&nbsp;
+            message += ",";<br>&nbsp;&nbsp;<b>
+            message += "\"time\":\"";<br>&nbsp;&nbsp;
+            getTimeString(time_buff);<br>&nbsp;&nbsp;
+            message += time_buff;<br>&nbsp;&nbsp;
+            message += "\"}";<br>&nbsp;&nbsp;</b>
+            server.send(200, "application/json", message);<br>
+          }<br>
+          <br>
+          /*******************************<br>
+          &nbsp;* setup and loop &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*<br>
+          &nbsp;*******************************/<br>
+          void setup() {<br>&nbsp;&nbsp;
+            // setup the on-board pin to output mode<br>&nbsp;&nbsp;
+            pinMode(ONBOARD_LED_PIN, OUTPUT);<br>&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;
+            // start serial connection<br>&nbsp;&nbsp;
+            Serial.begin(115200);<br>&nbsp;&nbsp;
+            Serial.println("");<br>&nbsp;&nbsp;
+            Serial.print("Connecting to ");<br>&nbsp;&nbsp;
+            Serial.println(ssid);<br>&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;
+            // set WiFi to STA mode<br>&nbsp;&nbsp;
+            WiFi.mode(WIFI_STA);<br>&nbsp;&nbsp;
+            // set static IP<br>&nbsp;&nbsp;
+            IPAddress ip(192,168,1,<text class="group_number"></text>);<br>&nbsp;&nbsp;
+            IPAddress gateway(192,168,1,254);<br>&nbsp;&nbsp;
+            IPAddress subnet(255,255,255,0);<br>&nbsp;&nbsp;
+            WiFi.config(ip, gateway, subnet);<br>&nbsp;&nbsp;
+            // connect to AP<br>&nbsp;&nbsp;
+            WiFi.begin(ssid, password);<br>&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;
+            // wait until connection is complete<br>&nbsp;&nbsp;
+            while (WiFi.status() != WL_CONNECTED) {<br>&nbsp;&nbsp;&nbsp;&nbsp;
+              delay(500);<br>&nbsp;&nbsp;&nbsp;&nbsp;
+              Serial.print(".");<br>&nbsp;&nbsp;
+            }<br>&nbsp;&nbsp;
+            Serial.println("");<br>&nbsp;&nbsp;
+            Serial.println("WiFi connected");<br>&nbsp;&nbsp;
+            Serial.println("IP address: ");<br>&nbsp;&nbsp;
+            Serial.println(WiFi.localIP());<br>
+            <br>&nbsp;&nbsp;<b>
+            // get time from NTP<br>&nbsp;&nbsp;
+            getNtpTime();<br>&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;</b>
+            server.on("/", handleRoot);<br>&nbsp;&nbsp;
+            server.on("/json", sendJsonResponse);<br>&nbsp;&nbsp;
+            server.onNotFound(handleNotFound);<br>&nbsp;&nbsp;
+            server.begin();<br>
+          }<br>
+          <br>
+          void loop()<br>
+          {<br>&nbsp;&nbsp;
+            // toggle the LED each 0.1 second<br>&nbsp;&nbsp;
+            digitalWrite(ONBOARD_LED_PIN, HIGH);<br>&nbsp;&nbsp;
+            delay(100);<br>&nbsp;&nbsp;
+            digitalWrite(ONBOARD_LED_PIN, LOW);<br>&nbsp;&nbsp;
+            delay(100);<br>&nbsp;&nbsp;
+            server.handleClient();<br>
+          }<br>
+        <br>
+        </code>
+        <br><br>
+        <button onclick="show_step('step02')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step04')">Next</button>
+      </div>
+      <div class="step" id="step04">
+        <h3>Testing Time</h3>
+        <p>
+          <a class="group_number_link" href="/json" target="_blank">192.168.1.<text class="group_number"></text>/json</a><br>
+          The response from the device should include the current time.<br>
+        </p>
+        192.168.1.<text class="group_number"></text>/json&nbsp;&nbsp;&nbsp;<button onclick="try_time()">Go</button><br>
+        <br>
+        <textarea id="test_text" rows="15" cols="120"></textarea>
+        <br>
+        <button onclick="show_step('step03')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step05')">Next</button>
+      </div>
+      <div class="step" id="step05">
+        <h3>Verification</h3>
+        <br>
+        <p>Click "Test me" when you are ready.</p>
+        <button onclick="show_step('step04')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="test_me(6, 5)">Test me</button>&nbsp;&nbsp;&nbsp;
+        <button id="next_task" onclick="location.href='./task_07.html';" disabled>Next Task</button>
+        <br>
+        <textarea id="server_test_text" rows="15" cols="120"></textarea>
+      </div>
+      <text id="debug_text"></text>
+    </div>
+    <br><br><br><br><br><br>
+    <script src="../instructions.js" type="text/javascript"></script>
+  </body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link media="screen" type="text/css" href="./style.css" rel="stylesheet">
+    </head>
+  <body>
+    <div id="reload_yaml_div">
+      <button id="reload_yaml_button" onclick="reload_yaml()">reload yaml</button>
+    </div>
+    <div id="manager_div">
+      <h2>Task Control</h2>
+      <table id="tasks_table">
+      </table>
+    </div>
+    <div id="status_div">
+      <h2>Debug center</h2>
+      <table id="debug_table">
+        <tr>
+          <th>Group</th>
+          <th>API/Temp/Time</th>
+          <th>Lights</th>
+          <th>TV</th>
+          <th>AC</th>
+          <th>Bad URL</th>
+        </tr>
+        <tr>
+          <td>
+            <select id="debug_group">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+            </select>
+          </td>
+          <td>
+            <button id="debug_button_api" onclick="send_debug_api()">Send</button>
+          </td>
+          <td>
+            <input type="checkbox" id="debug_checkbox_light_1" onchange="send_lights_api(1)">1</input>
+            <input type="checkbox" id="debug_checkbox_light_2" onchange="send_lights_api(2)">2</input>
+            <input type="checkbox" id="debug_checkbox_light_3" onchange="send_lights_api(3)">3</input>
+          </td>
+          <td>
+            <input type="checkbox" id="debug_checkbox_tv" onchange="send_tv_api()">on</input>
+          </td>
+          <td>
+            <input type="checkbox" id="debug_checkbox_ac">on</input>
+            <input type="number" id="debug_text_ac" value="22" style="width: 50px;">&nbsp;temp</input>
+            &nbsp;&nbsp;&nbsp;
+            <button id="debug_button_ac" onclick="send_ac_api()">Send</button>
+          </td>
+          <td>
+            <button id="debug_button_bad_api" onclick="send_debug_bad_api()">Send</button>
+          </td>
+        </tr>
+      </table>
+      <br><br>
+      <text id="debug_text"></text>
+    </div>
+    <script src="manager.js" type="text/javascript"></script>
+  </body>
+</html>

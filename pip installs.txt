@@ -1,0 +1,6 @@
+pip install flask
+pip install flask-cors
+pip install pymongo
+pip install pyserial
+pip install pyyaml
+pip install requests

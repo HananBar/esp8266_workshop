@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link media="screen" type="text/css" href="../style.css" rel="stylesheet">
+    </head>
+  <body>
+    <div id="headline">
+      <h1>ESP8266 Workshop</h1>
+      <h2>Task 1: Initial setup and connect to AP</h2>
+    </div>
+    <div id="name_and_number">
+      <h2>Group <text class="group_number"></text> - <text class="group_name"></text><h2>
+      <a class="active" href="#">1</a>
+      <a class="enabled_page" href="./task_02.html">2</a>
+      <a class="enabled_page" href="./task_03.html">3</a>
+      <a class="enabled_page" href="./task_04.html">4</a>
+      <a class="enabled_page" href="./task_05.html">5</a>
+      <a class="enabled_page" href="./task_06.html">6</a>
+      <a class="enabled_page" href="./task_07.html">7</a>
+      <a class="enabled_page" href="./task_08.html">8</a>
+      <a class="enabled_page" href="./task_09.html">9</a>
+      <a class="enabled_page" href="./task_10.html">10</a>
+    </div>
+    <div id="steps">
+      <div class="step" id="step01">
+        <h3>IDE setup</h3>
+        <p>Do you have the Arduino IDE installed?</p><br>
+        <button onclick="show_step('step03')">Yes</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step02')">No</button>
+      </div>
+      <div class="step" id="step02">
+        <h3>IDE installation</h3>
+        <p>go to <a href="https://www.arduino.cc/en/main/software" target="_blank">the Arduino software download page</a> to get the IDE</p>
+        <p>Install according to instructions</p><br>
+        <button onclick="show_step('step01')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step03')">Next</button>
+      </div>
+      <div class="step" id="step03">
+        <h3>Device setup</h3>
+        <p>Open your device manager (<kbd>Win</kbd>+<kbd>R</kbd> + devmgmt.msc)</p>
+        <p>make sure the device is recognized and appears as a valid COM port in your device manager:</p>
+        <img src="../images/device_manager.png"/><br>
+        <p>is this what you see? (COM port number might be different)</p><br>
+        <button onclick="show_step('step01')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step05')">Yes</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step04')">No</button>
+      </div>
+      <div class="step" id="step04">
+        <h3>Driver installation</h3>
+        <p>go to <a href="https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers" target="_blank">this site</a> to get the driver.</p>
+        <p>download the correct installer according to your OS version</p>
+        <p>install the driver and make sure the device now appears as a valid COM port</p><br>
+        <button onclick="show_step('step03')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step05')">Next</button>
+      </div>
+      <div class="step" id="step05">
+        <h3>IDE configuration</h3>
+        <p>Open the Arduino IDE and open the preferences menu (File->Preferences or <kbd>Ctrl</kbd>+<kbd>,</kbd>)</p>
+        <img src="../images/file_preferences.png"/><br>
+        <p>insert the following URL to the "Additional Boards Manager URLs": 
+          <code>http://arduino.esp8266.com/stable/package_esp8266com_index.json</code>
+        </p>
+        <img src="../images/preferences_boards.png"/><br><br>
+        <button onclick="show_step('step03')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step06')">Next</button>
+      </div>
+      <div class="step" id="step06">
+        <h3>IDE configuration</h3>
+        <p>Are you on Intel's office network (Not "Guest")?</p><br>
+        <button onclick="show_step('step05')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step07')">Yes</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step08')">No</button>
+      </div>
+      <div class="step" id="step07">
+        <h3>IDE configuration - Proxy</h3>
+        <p>On the preferences menu switch to "Network" tab</p>
+        <p>select "Manual proxy configuration"</p>
+        <p>Host name: proxy.iil.intel.com</p>
+        <p>Port Number: 911</p>
+        <img src="../images/preferences_proxy.png"/><br><br>
+        <button onclick="show_step('step06')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step08')">Next</button>
+      </div>
+      <div class="step" id="step08">
+        <h3>IDE configuration - Board</h3>
+        <p>Open the Boards Manager (Tools->Board->Boards Manager...)</p>
+        <img src="../images/tools_boards.png"/><br>
+        <p>Search for "ESP8266" and install the boards package</p>
+        <img src="../images/boards_manager.png"/><br><br>
+        <button onclick="show_step('step06')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step09')">Next</button>
+      </div>
+      <div class="step" id="step09">
+        <h3>IDE configuration - Board Selection</h3>
+        <p>You should now select the board (NodeMCU 1.0)</p>
+        <img src="../images/board_selection.png"/><br>
+        <p>and make sure the correct COM port is selected as well</p>
+        <img src="../images/port_selection.png"/><br><br>
+        <button onclick="show_step('step08')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step10')">Next</button>
+      </div>
+      <div class="step" id="step10">
+        <h3>Connect to AP</h3>
+        <p>now that everything is set up, let's try to connect to the AP<br><br>
+          the AP name is "intel makers"<br>
+          and the password is "1234567890"<br><br>
+          you can use the code below as a reference</p>
+        <code>
+          #include &lt;ESP8266WiFi.h&gt;<br>
+          <br>
+          const char* ssid     = "intel makers";<br>
+          const char* password = "1234567890";<br>
+          #define ONBOARD_LED_PIN D4<br>
+          <br>
+          void setup() {<br>&nbsp;&nbsp;
+            // setup the on-board pin (D4) to output mode<br>&nbsp;&nbsp;
+            pinMode(ONBOARD_LED_PIN, OUTPUT);<br>&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;
+            // start serial connection<br>&nbsp;&nbsp;
+            Serial.begin(115200);<br>&nbsp;&nbsp;
+            Serial.println("");<br>&nbsp;&nbsp;
+            Serial.print("Connecting to ");<br>&nbsp;&nbsp;
+            Serial.println(ssid);<br>&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;
+            // set WiFi to STA mode and connect to AP<br>&nbsp;&nbsp;
+            WiFi.mode(WIFI_STA);<br>&nbsp;&nbsp;
+            WiFi.begin(ssid, password);<br>&nbsp;&nbsp;
+            <br>&nbsp;&nbsp;
+            // wait until connection is complete<br>&nbsp;&nbsp;
+            while (WiFi.status() != WL_CONNECTED) {<br>&nbsp;&nbsp;&nbsp;&nbsp;
+              delay(500);<br>&nbsp;&nbsp;&nbsp;&nbsp;
+              Serial.print(".");<br>&nbsp;&nbsp;
+            }<br>&nbsp;&nbsp;
+            Serial.println("");<br>&nbsp;&nbsp;
+            Serial.println("WiFi connected");<br>&nbsp;&nbsp;
+            Serial.println("IP address: ");<br>&nbsp;&nbsp;
+            Serial.println(WiFi.localIP());<br>
+          }<br>
+          <br>
+          void loop()<br>
+          {<br>&nbsp;&nbsp;
+            // toggle the LED each second<br>&nbsp;&nbsp;
+            digitalWrite(ONBOARD_LED_PIN, HIGH);<br>&nbsp;&nbsp;
+            delay(1000);<br>&nbsp;&nbsp;
+            digitalWrite(ONBOARD_LED_PIN, LOW);<br>&nbsp;&nbsp;
+            delay(1000);<br>
+          }<br>
+        <br>
+        </code>
+        <br><br>
+        <button onclick="show_step('step09')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="show_step('step11')">Next</button>
+      </div>
+      <div class="step" id="step11">
+        <h3>Connect to AP - verify connection</h3>
+        <p>open the serial monitor (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd>)<br>
+          you should see a similar message</p>
+        <img src="../images/serial_monitor.png"/><br>
+        <p>if you don't - check for serial monitor rate (set to 115200)<br>
+        if the dots don't stop - make sure the SSID and password are correct</p>
+        <br>
+        <br>
+        <br>
+        <p>Click "Test me" when you are ready.</p>
+        <button onclick="show_step('step10')">Back</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="test_me(1, 5)">Test me</button>&nbsp;&nbsp;&nbsp;
+        <button id="next_task" onclick="location.href='./task_02.html';" disabled>Next Task</button>
+        <br>
+        <textarea id="server_test_text" rows="15" cols="120"></textarea>
+      </div>
+      <text id="debug_text"></text>
+    </div>
+    <br><br><br><br><br><br>
+    <script src="../instructions.js" type="text/javascript"></script>
+  </body>
+</html>

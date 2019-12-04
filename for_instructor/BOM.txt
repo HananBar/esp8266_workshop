@@ -1,0 +1,35 @@
+There might be better deals out there. but the goal was to find all components in one store for easier shipping.
+Also since we ended doing this workshop at work - a single invoice was a nice touch.
+
+1 kit - 
+* NodeMCU - ESP8266 dev board with CP2102 (fits better on breadboard)
+https://www.aliexpress.com/item/32719524260.html
+
+* breadboard
+https://www.aliexpress.com/item/32967520219.html
+
+* wires
+https://www.aliexpress.com/item/32827198981.html
+
+* Thermistor (100K)
+https://www.aliexpress.com/item/32965114232.html
+
+* Resistors (100K for thermistor + 220 for LEDs)
+https://www.aliexpress.com/item/32920952714.html
+
+* LEDs
+https://www.aliexpress.com/item/33029710722.html
+
+* IR LEDs (10 pcs emitter)
+https://www.aliexpress.com/item/33049106838.html
+
+* OLED screen (4pin - I2C)
+https://www.aliexpress.com/item/32896205376.html
+
+* micro USB cable
+
+
+Additional equipment:
+1 AP
+IR receiver (TBD)
+Controller (laptop)

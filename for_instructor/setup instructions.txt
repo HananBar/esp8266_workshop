@@ -1,0 +1,32 @@
+setting up everything:
+
+currently this workshop is running on Windows.
+installations:
+* python 3.x
+* the following python libraries:
+  * pip install flask
+  * pip install flask-cors
+  * pip install pymongo
+  * pip install pyserial
+  * pip install pyyaml
+  * pip install requests
+* mongo db
+* apache server
+
+Setup AP to give out dynamic IPs from 192.168.1.101 (static IPs will start at 192.168.1.1)
+
+AP static address 192.168.1.254
+Controller address 192.168.1.100
+
+copy 'instructions' folder content to apache root
+
+prepare database:
+* update 'configuration.yaml' with MAC addresses of your devices
+* run "db_access.py" to reset database and update it with MAC addresses.
+
+run 2 python scripts in the background:
+* devices_services.py
+* ntpserver.py
+
+run the flask app:
+* server.py

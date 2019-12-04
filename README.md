@@ -11,7 +11,7 @@ Current implementation assumes:
 1. Webserver is running and the contents of "instructions" folder is in the root you point to when starting the workshop.
 2. configuration.yaml holds all configurations - including all the workshop devices MAC addresses.
 3. MongoDB is running (run db_access.py once to populate DB)
-4. all libraries from 'pip_install.txt' are installed
+4. all libraries from 'for_instructor/setup instructions.txt' are installed
 5. You can control your AP's settings with<br>
  a. Setup low-band (2.4GHz) SSID as 'intel makers'<br>
  b. Setup high-band (5.2GHz) SSID as a different SSID (we used 'ESP8266 workshop')<br>

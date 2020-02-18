@@ -53,13 +53,25 @@ def create_base_yaml():
             {"number": 16,
              "degrees": 100,
              "mac": "dc-4f-22-18-d0-b3"},
+            {"number": 17,
+             "degrees": 100,
+             "mac": "de-ad-be-ef-00-00"},
+            {"number": 18,
+             "degrees": 100,
+             "mac": "de-ad-be-ef-00-01"},
+            {"number": 19,
+             "degrees": 100,
+             "mac": "de-ad-be-ef-00-02"},
+            {"number": 20,
+             "degrees": 100,
+             "mac": "de-ad-be-ef-00-03"},
         ],
             "serial1": "COM3",
             "serial2": "COM4",
             "subnet_ip": "192.168.1.",
             "base_ip": 0,
             "dynamic_ip": 100,
-            "groups_number": 16
+            "groups_number": 20
         }
     stream = open('configuration.yaml', 'w')
     dump(my_yaml, stream)

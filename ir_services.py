@@ -1,5 +1,6 @@
 import time
 import serial
+import requests
 
 
 class IrSerialServices:
@@ -50,6 +51,80 @@ class IrSerialServices:
         return False
 
 
+class IrWebServices:
+
+    used_ips = []
+    pool_ips = []
+
+    @staticmethod
+    def add_ip_to_pool(ip):
+        if ip not in IrWebServices.pool_ips:
+            IrWebServices.pool_ips.append(ip)
+
+    @staticmethod
+    def get_free_ip():
+        for ip in IrWebServices.pool_ips:
+            if ip not in IrWebServices.used_ips:
+                return ip
+        return ''
+
+    @staticmethod
+    def start_capture(ip, group_number):
+        if ip in IrWebServices.used_ips:
+            return False
+        try:
+            url = "http://" + ip + "/ir?state=start&group=" + str(group_number)
+            response = requests.get(url)
+            if response.status_code == 200:
+                try:
+                    json_data = response.json()
+                except Exception:  # json parsing exception
+                    return 'Could not parse JSON response'
+                if json_data['status'] != 'success':
+                    return False
+            else:
+                print('Could not get a response from ' + url)
+                return False
+        except Exception as e:
+            print(f'exception while trying to connect to IR server, {str(e)}')
+            return False
+        IrWebServices.used_ips.append(ip)
+        return True
+
+    @staticmethod
+    def stop_and_get_capture(ip):
+        capture = ''
+        try:
+            IrWebServices.used_ips.remove(ip)
+            url = "http://" + ip + "/ir?state=stop"
+            response = requests.get(url)
+            if response.status_code == 200:
+                try:
+                    json_data = response.json()
+                except Exception:  # json parsing exception
+                    return ''
+                if json_data['status'] != 'success':
+                    return ''
+                else:
+                    for el in json_data['captured']:
+                        capture += el + ":"
+            else:
+                print('Could not get a response from ' + url)
+        except Exception as e:
+            print(f'exception while trying to connect to IR server, {str(e)}')
+        return capture
+
+    @staticmethod
+    def try_stop_and_search_response(connection, group=-1, device=-1, state=-1, temperature=-1):
+        capture = IrSerialServices.try_stop_and_get_capture(connection)
+        if connection is not None:
+            inp = IrNecParser()
+            if state == 0:
+                temperature = -1
+            return inp.is_ir_match(capture, group, device, state, temperature)
+        return False
+
+
 class IrNecParser:
 
     _reversed = [
@@ -78,7 +153,8 @@ class IrNecParser:
         self.temperature = 0
 
     def _parse(self, stream):
-        # stream = byte_stream.decode('utf-8')
+        if len(stream) == 6:
+            stream = '0' + stream
         if len(stream) == 7:
             stream = '0' + stream
         # print(stream)
@@ -100,7 +176,8 @@ class IrNecParser:
         self.group = self.device = self.state = self.temperature = 0
 
     def is_ir_match(self, byte_stream, group=-1, device=-1, state=-1, temperature=-1):
-        words = byte_stream.decode('utf-8').split(':')
+        #words = byte_stream.decode('utf-8').split(':')
+        words = byte_stream.split(':')
         for word in words:
             current_match = True
             self._parse(word)
@@ -122,8 +199,28 @@ class IrNecParser:
 
 
 if __name__ == "__main__":
-    con1 = IrSerialServices.try_open_serial_connection('COM18')
-    con2 = IrSerialServices.try_open_serial_connection('COM19')
-    time.sleep(2)
-    for deg in range(0,10):
-        print(deg * 10)
+    # con1 = IrSerialServices.try_open_serial_connection('COM18')
+    # con2 = IrSerialServices.try_open_serial_connection('COM19')
+    # time.sleep(2)
+    # for deg in range(0,10):
+    #     print(deg * 10)
+    IrWebServices.add_ip_to_pool('192.168.1.20')
+    IrWebServices.add_ip_to_pool('192.168.1.21')
+
+    web1 = IrWebServices.get_free_ip()
+    IrWebServices.start_capture(web1, 3)
+    web2 = IrWebServices.get_free_ip()
+    IrWebServices.start_capture(web2, 4)
+    web3 = IrWebServices.get_free_ip()
+    IrWebServices.start_capture(web3, 5)
+    time.sleep(10)
+    inp = IrNecParser()
+    capture = IrWebServices.stop_and_get_capture(web1)
+    print(capture)
+    inp.is_ir_match(capture)
+    capture = IrWebServices.stop_and_get_capture(web2)
+    print(capture)
+    inp.is_ir_match(capture)
+    capture = IrWebServices.stop_and_get_capture(web3)
+    print(capture)
+    inp.is_ir_match(capture)

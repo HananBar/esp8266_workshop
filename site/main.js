@@ -1,3 +1,4 @@
+var g_number_of_groups = 20
 
 function parse_and_update_firsts(e) {
   var xhr = e.target;
@@ -17,7 +18,7 @@ function parse_and_draw_groups(e) {
   if (xhr.readyState == 4 && xhr.status == 200) {
     var data = JSON.parse(xhr.responseText);
     var leaders = new Array();
-    for (var i = 0; i < 16; i += 1) {
+    for (var i = 0; i < g_number_of_groups; i += 1) {
       draw_group(i+1,
                  data['groups'][i]['current_task'],
                  data['groups'][i]['points'],

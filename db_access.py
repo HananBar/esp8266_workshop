@@ -45,6 +45,8 @@ class WorkshopDb:
         'groups_number',
     ]
 
+    _number_of_groups = 20
+
     def __init__(self):
         self.client = MongoClient('mongodb://localhost:27017/')
 
@@ -57,7 +59,7 @@ class WorkshopDb:
         config = ConfigManager()
         groups_collection = db_handle['groups']
         group_list = []
-        for group in range(1, 17):
+        for group in range(1, self._number_of_groups + 1):
             new_group = {key: 0 for key in self._group_keys}
             new_group['number'] = group
             new_group['current_task'] = 1
@@ -82,7 +84,7 @@ class WorkshopDb:
             config_collection.insert_one(new_config)
         devices_ip_collection = db_handle['devices_ip']
         devices_ip_list = []
-        for group in range(1,17):
+        for group in range(1,self._number_of_groups + 1):
             devices_ip_list.append({'mac': config.get_group_mac_address(group),
                                     'ip': ''})
         devices_ip_collection.insert_many(devices_ip_list)
@@ -284,7 +286,7 @@ class WorkshopDb:
         db_handle = self.client['esp8266_workshop']
         # update all groups mac address and degrees
         groups_collection = db_handle['groups']
-        for group in range(1, 17):
+        for group in range(1, self._number_of_groups + 1):
             group_query = {'number': group}
             groups = []
             for g in groups_collection.find(group_query, {'_id': 0}):

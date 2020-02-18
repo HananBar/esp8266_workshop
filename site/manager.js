@@ -1,6 +1,7 @@
 var g_tasks = new Array();
 var g_groups_start = 0;
 var data_keys = ["name", "number", "temperature", "time", "lights", "tv_state", "ac_state", "ac_temp"]
+var g_number_of_groups = 20
 
 function reload_yaml() {
   var xhr = new XMLHttpRequest();
@@ -190,7 +191,7 @@ function parse_and_update_groups(e) {
   var xhr = e.target;
   if (xhr.readyState == 4 && xhr.status == 200) {
     var data = JSON.parse(xhr.responseText);
-    for (var i = 0; i < 16; i += 1) {
+    for (var i = 0; i < g_number_of_groups; i += 1) {
       update_group(i+1,
                   data['groups'][i]['current_task'],
                   data['groups'][i]['name']);
@@ -218,7 +219,7 @@ function parse_and_update_tasks(e) {
     // add bonus task column
     table_content += "<th>Bonus</th>";
     table_content += "</tr>";
-    for (var i = 0; i < 16; i += 1) {
+    for (var i = 0; i < g_number_of_groups; i += 1) {
       table_content += "<tr id=\"group_" + (i + 1) + "\">";
       for (var j = 0; j < g_tasks.length + 1; j += 1) {
         if (j == 0) {

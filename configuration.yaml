@@ -49,7 +49,19 @@ groups:
 - degrees: 100
   mac: dc-4f-22-18-d0-b3
   number: 16
-groups_number: 16
+- degrees: 100
+  mac: de-ad-be-ef-00-00
+  number: 17
+- degrees: 100
+  mac: de-ad-be-ef-00-01
+  number: 18
+- degrees: 100
+  mac: de-ad-be-ef-00-02
+  number: 19
+- degrees: 100
+  mac: de-ad-be-ef-00-03
+  number: 20
+groups_number: 20
 serial1: COM3
 serial2: COM4
 subnet_ip: 192.168.1.

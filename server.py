@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pymongo import MongoClient
 from db_access import WorkshopDb
+from config_manager import ConfigManager
 from task01_connect import Task01_Connect
 from task02_static import Task02_StaticIp
 from task03_webserver import Task03_WebServer
@@ -32,7 +33,7 @@ tasks_classes = [
     Task10_Screen
 ]
 tasks_objects = [t() for t in tasks_classes]
-
+config = ConfigManager()
 
 @app.route('/')
 def api_root():
@@ -84,9 +85,12 @@ def api_test(task_id):
     data = request.form
     group_id = int(data['group_id'])
     points = int(data['points'])
+    group_number = group_id
+    if group_number > config.get_item('groups_number'):
+        group_number = group_id & 0xff
     if int(task_id) <= len(tasks_objects):
         status = 'passed' if tasks_objects[int(task_id) - 1].test(group_id, points) else 'failed'
-        group = groups_collection.find({'number': group_id}, {'_id': 0})
+        group = groups_collection.find({'number': group_number}, {'_id': 0})
         msg = group[0]['dbg_msg']
     else:
         status = 'failed'

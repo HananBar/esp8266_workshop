@@ -115,6 +115,16 @@ class IrWebServices:
         return capture
 
     @staticmethod
+    def release(ip):
+        try:
+            IrWebServices.used_ips.remove(ip)
+            url = "http://" + ip + "/ir?state=stop"
+            requests.get(url, timeout=0.3)
+        except Exception as e:
+            print(f'exception while trying to connect to IR server, {str(e)}')
+        print('released ' + ip)
+
+    @staticmethod
     def try_stop_and_search_response(connection, group=-1, device=-1, state=-1, temperature=-1):
         capture = IrSerialServices.try_stop_and_get_capture(connection)
         if connection is not None:

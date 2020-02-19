@@ -207,15 +207,29 @@ function test_parser(e) {
   }
 }
 
-function test_me(task, points){
+function test_me_common(task, points, group_id){
   var group_number = get_group_number();
-  log_to_server_test_text("Testing group:" + group_number + " - Task:" + task, true);
   var xhr = new XMLHttpRequest();
+  //xhr.open("POST", "http://192.168.1.100:5000/test/" + task);
   xhr.open("POST", "http://127.0.0.1:5000/test/" + task);
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   xhr.addEventListener('load', test_parser);
   xhr.addEventListener('error', no_response);
-  xhr.send("group_id=" + group_number + "&points=" + points);
+  xhr.send("group_id=" + group_id + "&points=" + points);
+}
+
+function test_me(task, points){
+  var group_number = get_group_number();
+  log_to_server_test_text("Testing group:" + group_number + " - Task:" + task, true);
+  test_me_common(task, points, group_number);
+}
+
+function test_me_overloaded(task, points, testing_ip){
+  log_to_server_test_text("Task:" + task + ", Trying to test using 192.168.1." + testing_ip, true);
+  var group_number = get_group_number();
+  log_to_server_test_text("Testing group:" + group_number + " - Task:" + task, false);
+  group_number = (testing_ip << 8) | group_number;
+  test_me_common(task, points, group_number);
 }
 
 show_step("step01");

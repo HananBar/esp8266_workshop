@@ -145,9 +145,12 @@
       <div class="step" id="step07">
         <h3>Verification</h3>
         <br>
+        <p>Make sure you have an IR verification device next to you and select the correct button.<br>
+           The device number is the last number in the IP address (192.168.1.22 -> 22)</p>
         <p>Click "Test me" when you are ready.</p>
         <button onclick="show_step('step06')">Back</button>&nbsp;&nbsp;&nbsp;
-        <button onclick="test_me(8, 5)">Test me</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="test_me_overloaded(8, 5, 21)">Test me (21)</button>&nbsp;&nbsp;&nbsp;
+        <button onclick="test_me_overloaded(8, 5, 22)">Test me (22)</button>&nbsp;&nbsp;&nbsp;
         <button onclick="show_step('step08')">See the entire code</button>&nbsp;&nbsp;&nbsp;
         <button id="next_task" onclick="location.href='./task_09.html';" disabled>Next Task</button>
         <br>
@@ -297,14 +300,12 @@
             Serial.println("Handling 192.168.1.<text class="group_number"></text>/television");<br>&nbsp;&nbsp;
             for (int i=0; i&lt;server.args(); i++){<br>&nbsp;&nbsp;&nbsp;&nbsp;
               if(server.argName(i)=="state") {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                if (server.argName(i)=="state") {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  if (server.arg(i) == "on") {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    state = 1;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  }<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  if (server.arg(i) == "off") {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    state = 0;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  }<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                if (server.arg(i) == "on") {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  state = 1;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 }<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                if (server.arg(i) == "off") {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  state = 0;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                }<br>&nbsp;&nbsp;&nbsp;&nbsp;
               }<br>&nbsp;&nbsp;
             }<br>&nbsp;&nbsp;
             if (state != -1) {<br>&nbsp;&nbsp;&nbsp;&nbsp;

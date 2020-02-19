@@ -55,7 +55,7 @@ def create_base_yaml():
              "mac": "dc-4f-22-18-d0-b3"},
             {"number": 17,
              "degrees": 100,
-             "mac": "de-ad-be-ef-00-00"},
+             "mac": "dc-4f-22-18-f6-4d"},
             {"number": 18,
              "degrees": 100,
              "mac": "de-ad-be-ef-00-01"},
@@ -109,4 +109,4 @@ class ConfigManager:
 if __name__ == "__main__":
     create_base_yaml()
     config = ConfigManager()
-    print(config.get_item("serial1"))
+    print(config.get_item("groups_number"))

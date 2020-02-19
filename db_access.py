@@ -301,6 +301,13 @@ class WorkshopDb:
             new_config = {'name': config_item,
                           'value': config.get_item(config_item)}
             config_collection.insert_one(new_config)
+        db_handle.drop_collection('devices_ip')
+        devices_ip_collection = db_handle['devices_ip']
+        devices_ip_list = []
+        for group in range(1,self._number_of_groups + 1):
+            devices_ip_list.append({'mac': config.get_group_mac_address(group),
+                                    'ip': ''})
+        devices_ip_collection.insert_many(devices_ip_list)
 
 
 if __name__ == '__main__':

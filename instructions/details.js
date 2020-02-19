@@ -57,7 +57,7 @@ function save_group_name_and_number() {
   print_error("")
   var number = document.getElementById("group_number").value;
   var int_number = parseInt(number);
-  if ((int_number != NaN) && (int_number <= 16) && (int_number > 0)) {
+  if ((int_number != NaN) && (int_number <= 20) && (int_number > 0)) {
     var name = document.getElementById("group_name").value;
     if (name == "") {
       name = random_name()
@@ -66,7 +66,7 @@ function save_group_name_and_number() {
     set_group_number(number);
     window.location.href = "./tasks/task_01.html"
   } else {
-    print_error("Group number should be 1-16")
+    print_error("Group number should be 1-20")
   }
 }
 

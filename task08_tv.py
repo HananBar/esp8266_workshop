@@ -86,9 +86,11 @@ class Task08_TvControl(TaskBase):
                     message = self.try_to_parse_response(group_number, response, verification_sequences[i])
                     if message != 'success':
                         self.group_failed(group_number, message)
+                        IrWebServices.release(self.subnet + str(ir_dev_number))
                         return False
                 else:
                     self.group_failed(group_number, 'Could not get a response from ' + url)
+                    IrWebServices.release(self.subnet + str(ir_dev_number))
                     return False
                 time.sleep(0.5)  # give it a little time...
                 dbg_msg += 'got JSON response - checking IR device\n'
@@ -106,6 +108,7 @@ class Task08_TvControl(TaskBase):
             return True
         # true - this is bad practice but everything other than 200 here - is a failure.
         except Exception:
+            IrWebServices.release(self.subnet + str(ir_dev_number))
             pass
         self.group_failed(group_number, 'Could not get valid json response from ' + url_base)
         return False
@@ -114,5 +117,5 @@ class Task08_TvControl(TaskBase):
 if __name__ == '__main__':
     t = Task08_TvControl()
     group_number = 11
-    ir_number = 20
+    ir_number = 21
     print(t.test((ir_number << 8) + group_number, 5))

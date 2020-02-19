@@ -95,10 +95,12 @@ class Task09_AcControl(TaskBase):
                     if message != 'success':
                         self.group_failed(group_number, message)
                         self.during_run = False
+                        IrWebServices.release(self.subnet + str(ir_dev_number))
                         return False
                 else:
                     self.group_failed(group_number, 'Could not get a response from ' + url)
                     self.during_run = False
+                    IrWebServices.release(self.subnet + str(ir_dev_number))
                     return False
                 time.sleep(0.5)  # give it a little time...
                 dbg_msg += 'got JSON response - checking IR device\n'
@@ -119,7 +121,8 @@ class Task09_AcControl(TaskBase):
             return True
         # true - this is bad practice but everything other than 200 here - is a failure.
         except Exception:
-            pass
+            # in case of exception - release IR device
+            IrWebServices.release(self.subnet + str(ir_dev_number))
         self.group_failed(group_number, 'Could not get valid json response from ' + url_base)
         self.during_run = False
         return False
@@ -128,5 +131,5 @@ class Task09_AcControl(TaskBase):
 if __name__ == '__main__':
     t = Task09_AcControl()
     group_number = 11
-    ir_number = 20
+    ir_number = 21
     print(t.test((ir_number << 8) + group_number, 5))

@@ -1,0 +1,2 @@
+netstat -ano|findstr 123
+tskill pid
